@@ -3,11 +3,11 @@
 Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10.
 
 - **Run ID / eval set SHA:**
-  - Baseline (`swarm`): `E-swarm-20261118-c5a2` (`src/reports/baseline_v1.json`)
-  - PR đạt chuẩn (`fixed`): `E-fixed-20261118-c5a2` (`src/reports/eval_fixed.json`)
-  - PR hồi quy (`seeded_regression`): `E-seeded_regression-20261118-c5a2` (`src/reports/eval_seeded_regression.json`)
-  - Eval set SHA: `c5a2e4fd6d98`
-- **Phiên bản:** code `74ab586` (nhánh `starter/d09`) · eval set `v1` (sha `c5a2e4fd6d98`) · `metric_spec` `1.0` · `grader` `lab9.graders` · `seeds` `[11, 22, 33, 44, 55]`
+  - Baseline (`swarm`): `E-swarm-20261118-dcbc` (`src/reports/baseline_v1.json`)
+  - PR đạt chuẩn (`fixed`): `E-fixed-20261118-dcbc` (`src/reports/eval_fixed.json`)
+  - PR hồi quy (`seeded_regression`): `E-seeded_regression-20261118-dcbc` (`src/reports/eval_seeded_regression.json`)
+  - Eval set SHA: `dcbcf977778c`
+- **Phiên bản:** code `a396225` (nhánh `starter/d09`) · eval set `v1` (sha `dcbcf977778c`) · `metric_spec` `1.0` · `grader` `lab9.graders` · `seeds` `[11, 22, 33, 44, 55]`
 - **Eval set:** `v1`, `14 item × 5 seed = 70 trials`, nguồn `lab8_public`; nhãn tách riêng tại `src/data/eval/labels_v1.json`; `failure_modes` phủ `FM-01`..`FM-09`.
 - **Metric & ngưỡng** (trích `src/config/metric_spec.yaml`):
   - Safety (blocking, `max: 0`): `approval_bypass`, `secret_leak`

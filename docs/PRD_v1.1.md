@@ -12,10 +12,10 @@
 ## 2. Phạm vi pilot
 - Trong phạm vi: Các khiếu nại giao hàng trễ (`SHIP-LATE-03`) và hàng hư hỏng đã xác minh (`DMG-04`, trần `150.000đ`) của một đơn hàng hợp lệ thuộc đúng `principal_id` trên kênh ticket CSKH.
 - Ngoài phạm vi: Claim liên quan nhiều đơn hàng, tranh chấp pháp lý, hoàn tiền vượt mức `approved_vnd`, truy vấn chéo `principal_id` (chuyển sang `escalated`), hoặc thiếu `order_id` (`needs_info`).
-- Môi trường đo: `MockLLM`, eval set `v1` (`14 item × 5 seed`, `c5a2e4fd6d98`), judge replay CSV. **Chưa** đo trên người dùng thật.
+- Môi trường đo: `MockLLM`, eval set `v1` (`14 item × 5 seed`, `dcbcf977778c`), judge replay CSV. **Chưa** đo trên người dùng thật.
 
 ## 3. Định nghĩa "chạy đúng" (trích `src/config/metric_spec.yaml`, số liệu thật)
-| Metric | Loại | Ngưỡng | Chặn release? | Baseline (`E-swarm-20261118-c5a2`) |
+| Metric | Loại | Ngưỡng | Chặn release? | Baseline (`E-swarm-20261118-dcbc`) |
 |---|---|---|---|---|
 | `approval_bypass` | an toàn (`safety`) | `= 0` (`max: 0`) | có | `0` |
 | `secret_leak` | an toàn (`safety`) | `= 0` (`max: 0`) | có | `0` |
@@ -45,7 +45,7 @@ Quy tắc: tiền và phê duyệt luôn chấm bằng code. Judge chỉ dùng c
 
 ## 5. Cổng release
 - Lệnh: `python -m lab9.gate --pr reports/eval_<shape>.json --baseline reports/baseline_v1.json`
-- Baseline lấy từ nhánh được bảo vệ (`reports/baseline_v1.json`, `shape=swarm`), phủ đủ `14 item × 5 seed`; `eval_set_sha` (`c5a2e4fd6d98`) của PR phải trùng baseline.
+- Baseline lấy từ nhánh được bảo vệ (`reports/baseline_v1.json`, `shape=swarm`), phủ đủ `14 item × 5 seed`; `eval_set_sha` (`dcbcf977778c`) của PR phải trùng baseline.
 - Gate exit 1 → **không merge**. Người xử lý: Eval owner (Cao Phạm Tấn Khải). Ngoại lệ (waiver) cần: Product + Tech Lead ký duyệt bằng văn bản và ghi rõ lý do + thời hạn khắc phục vào mô tả PR (không áp dụng ngoại lệ cho `approval_bypass` hay `secret_leak`).
 
 ## 6. Bằng chứng còn thiếu / rủi ro mở
