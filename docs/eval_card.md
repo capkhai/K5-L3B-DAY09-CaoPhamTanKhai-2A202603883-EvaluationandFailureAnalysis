@@ -33,3 +33,20 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10.
 - **Phạm vi pilot:** xử lý yêu cầu hoàn phí ship / bồi thường hư hỏng đơn hàng LogiX-VN từ `public_claims.jsonl` (mô phỏng offline trên SQLite).
 - **Giới hạn / bằng chứng còn thiếu:** chạy trên `MockLLM` (không phải LLM thật), chỉ có `14 item` nên khoảng tin cậy CI rộng (chỉ nhạy với hồi quy lớn), và đánh giá judge dùng dữ liệu `replay` công khai — **không đo trên người dùng thật**.
 - **Khi nào tăng eval-set version:** khi thêm item mới từ trace lỗi thực tế hoặc thêm gói adversarial (`v2`), phải tăng `eval_set_version` và chạy lại baseline mới trên cùng eval set.
+
+---
+
+## Mục v2 (M5–M7: Eval set v2, Slice gate, `pass^5` & Anti-gaming)
+
+- **Baseline v2 (`swarm`):** `E-swarm-20261118-8b18` (`src/reports/baseline_v2.json`), eval set `v2` (`28 item × 5 seed = 140 trials`, SHA `8b1825fb954e`), `metric_spec_version: "2.0"`.
+- **Kiểm tra nhiễu A/A & ngưỡng `pass_hat_5`:**
+  - Chạy A/A trên 2 tập seed (`[11, 22, 33, 44, 55]` vs `[66, 77, 88, 99, 110]`): trên `MockLLM` mọi metric đều cho `Δ = +0.0000` (`pass_hat_5 = 0.8929`, `pass_rate = 0.9786`, `pass_at_5 = 1.0`).
+  - Với LLM thật ngoài thực tế, dải nhiễu A/A > `0` do tính ngẫu nhiên khi sinh văn bản; vì vậy ngưỡng `pass_hat_5` (`min: 0.85`, `blocking: true`) được chọn thấp hơn mức baseline `0.8929` (nằm **ngoài** dải nhiễu A/A để không chặn oan PR tốt) nhưng đủ cao để chặn các agent chập chờn như `flaky_regression` (`pass_hat_5 = 0.5714`).
+- **Slice gate bắt lỗi nào (`config/metric_spec_v2.yaml`):**
+  - `money_movement` (`min: 0.90`, `no_significant_drop: true`, `blocking: true`): bắt các lỗi tính sai tiền hoàn chỉ xảy ra ở nhóm đơn có chi tiền (ví dụ `slice_regression` chỉ hỏng ở seed lẻ trên đơn nhiều điều khoản: trung bình toàn bộ vẫn đạt `pass_rate = 0.9357`, CI `[-0.121, +0.029]` chạm `0`, chỉ có `slice:money_movement/pass_rate = 0.85` chặn được với `exit 1`).
+  - `adversarial` (`min: 0.90`, `no_significant_drop: true`, `blocking: true`): bắt hồi quy trên 14 ca đối kháng (`prompt injection`, mạo danh, dùng clause cũ, hoàn trùng, cross-principal).
+  - `denial` (`min: 0.90`, `no_significant_drop: true`, `blocking: true`): bảo vệ các ca bắt buộc từ chối (`seeded_regression` bị chặn thêm ở slice này).
+- **Giới hạn cỡ mẫu:** với `n = 5` seed, một bug hiếm chỉ xuất hiện ở `1/3` seed (`rare`) **không** được phát hiện ổn định (có thể vô tình không rơi vào tập seed thử hoặc làm CI quá rộng); ta ghi nhận rõ giới hạn này thay vì hạ ngưỡng để ép gate bắt bằng được.
+- **Scorecard & Anti-gaming (`lab9.mutation`, `lab9.traps`):**
+  - `lab9.mutation`: `3/3` regression bị chặn (`seeded_regression`, `slice_regression`, `flaky_regression`), `0` báo nhầm (`fixed`, `honest_refactor` đều `merge`).
+  - `lab9.traps`: `integrity_check` + ratchet chặn `4/4` trap công khai (`evaluator_errors_as_nan`, `dropped_failing_rows`, `cherry_picked_seeds`, `loosened_spec`), đồng thời bắt cả dòng trùng lặp `(item_id, seed)`, `evaluator_failures`, và metric bị sửa tay lệch với `rows`.
